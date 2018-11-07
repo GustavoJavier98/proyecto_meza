@@ -1,0 +1,107 @@
+package ascii;
+
+import javax.swing.*;
+import java.awt.event.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+public class visual extends JFrame implements ActionListener {
+    
+   private JMenuBar barra;
+   private JMenu menu1;
+   private JMenuItem mi1,mi2,mi3;
+   private JPanel panel;
+   private String ascii;
+   private JTextArea campo;
+  
+
+public visual(){
+        
+        setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+         barra = new JMenuBar();
+        setJMenuBar(barra);
+        
+        menu1 = new JMenu ("archivo");
+        barra.add(menu1);
+        mi2 = new JMenuItem ("abir");
+        mi2.addActionListener(this);
+        menu1.add(mi2);
+        mi3 = new JMenuItem ("guardar");
+        mi3.addActionListener(this);
+        menu1.add(mi3);
+         campo = new JTextArea(ascii);                                              
+         JScrollPane scroll = new JScrollPane(campo);
+         scroll.setBounds(10, 10, 1260, 748);
+         add(scroll);
+                                                
+      
+        
+       
+        
+       
+        
+
+
+}
+    
+
+ public void actionPerformed (ActionEvent e){
+     
+     Container f = this.getContentPane();
+     
+        if(e.getSource()==mi2){
+           
+				SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
+				fileChooser.showOpenDialog(null);
+					try {
+						File f = fileChooser.getSelectedFile();
+						final BufferedImage image = ImageIO.read(f);
+						if (image == null) throw new IllegalArgumentException(f + " no es una imagen valida.");
+						final String ascii = new ASCII().convertir(image);
+						final JTextArea textArea = new JTextArea(ascii, image.getHeight(), image.getWidth());
+						textArea.setFont(new Font("Monospaced", Font.BOLD, 2));
+                                                textArea.setEditable(false);
+                                                
+                                                
+						final JDialog dialog = new JOptionPane(new JScrollPane(textArea), JOptionPane.PLAIN_MESSAGE).createDialog(ASCII.class.getName());
+						
+                                                dialog.setResizable(true);
+						dialog.setVisible(true);
+                                                
+                                               campo.setText(ascii);
+                                               campo.setFont(new Font("Monospaced", Font.BOLD, 1));
+                                                 
+                                                 
+                                                 
+						
+                                               
+                                                
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+                                        
+				
+				
+			}
+                                });
+                                 
+                                
+        }
+         if(e.getSource()==mi3){
+             
+             
+             
+ }
+}
+}   
+
