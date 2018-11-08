@@ -1,0 +1,31 @@
+package ascii;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class conex {
+    private Connection conn; 
+    private Statement sentencia;
+    private ResultSet registro;
+    private String query;
+    
+    public conex(){
+        
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ascii","root","");
+            sentencia = conn.createStatement();
+            System.out.println("conexion ok");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(conex.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(conex.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+}
