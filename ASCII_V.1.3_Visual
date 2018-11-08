@@ -1,0 +1,194 @@
+package ascii;
+
+import javax.swing.*;
+import java.awt.event.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+public class visual extends JFrame implements ActionListener {
+    
+   private JMenuBar barra;
+   private JMenu menu1;
+   private JMenuItem mi4,mi2,mi3;
+   private JTextField txtid;
+   private JTextField txtnombre;
+   private JPanel panel;
+   private JLabel etiqueta;
+   private JLabel etiqueta2;
+   private JLabel etiqueta3;
+   public String ascii;
+   private JTextArea campo;
+   private FileInputStream fis;
+   private int longitudbytes;
+   
+   conex con = new conex();
+   Connection cn = con.conexion();
+  
+
+public visual(){
+        
+      
+    
+        setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+         barra = new JMenuBar();
+        setJMenuBar(barra);
+        etiqueta = new JLabel("Todo esto es para la Base de Datos");
+        etiqueta.setBounds(850, 10, 250, 20);
+        add(etiqueta);
+        menu1 = new JMenu ("archivo");
+        barra.add(menu1);
+        mi2 = new JMenuItem ("abir");
+        mi2.addActionListener(this);
+        menu1.add(mi2);
+        mi3 = new JMenuItem ("guardar");
+        mi3.addActionListener(this);
+        menu1.add(mi3);
+        mi4 = new JMenuItem ("guardar en base de datos");
+        mi4.addActionListener(this);
+        menu1.add(mi4);
+          txtid = new JTextField();
+        txtid.setBounds(950, 50, 150, 20);
+        add(txtid);
+         etiqueta2 = new JLabel("ID (solo numeros):");
+        etiqueta2.setBounds(820, 50, 150, 20);
+        add(etiqueta2);
+        txtnombre = new JTextField();
+        txtnombre.setBounds(950, 100, 150, 20);
+        add(txtnombre);
+        etiqueta3 = new JLabel("Nombre:");
+        etiqueta3.setBounds(820, 100, 150, 20);
+        add(etiqueta3);
+         campo = new JTextArea(ascii);                                              
+         JScrollPane scroll = new JScrollPane(campo);
+         scroll.setBounds(10, 10, 800, 600);
+         add(scroll);
+                                                
+      
+        
+       
+        
+       
+        
+
+
+}
+    
+
+ public void actionPerformed (ActionEvent e){
+     
+     Container f = this.getContentPane();
+     
+        if(e.getSource()==mi2){
+           
+				SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
+				fileChooser.showOpenDialog(null);
+					try {
+						File f = fileChooser.getSelectedFile();
+						final BufferedImage image = ImageIO.read(f);
+						if (image == null) throw new IllegalArgumentException(f + " no es una imagen valida.");
+						final String ascii = new ASCII().convertir(image);
+						final JTextArea textArea = new JTextArea(ascii, image.getHeight(), image.getWidth());
+						textArea.setFont(new Font("Monospaced", Font.BOLD, 2));
+                                                textArea.setEditable(false);
+                                                
+                                                
+						final JDialog dialog = new JOptionPane(new JScrollPane(textArea), JOptionPane.PLAIN_MESSAGE).createDialog(ASCII.class.getName());
+						
+                                                dialog.setResizable(true);
+						dialog.setVisible(true);
+                                                
+                                               campo.setText(ascii);
+                                               campo.setFont(new Font("Monospaced", Font.BOLD, 1));
+                                                 
+                                                 
+                                                 
+						
+                                               
+                                                
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+                                        
+				
+				
+			}
+                                });
+                                 
+                                
+        }
+         if(e.getSource()==mi3){
+ try
+ {
+  String nombre="";
+  JFileChooser file=new JFileChooser();
+  file.showSaveDialog(this);
+  File guarda =file.getSelectedFile();
+ 
+  if(guarda !=null)
+  {
+   /*guardamos el archivo y le damos el formato directamente,
+    * si queremos que se guarde en formato doc lo definimos como .doc*/
+    FileWriter  save=new FileWriter(guarda+".txt");
+    save.write(campo.getText());
+    save.close();
+    JOptionPane.showMessageDialog(null,
+         "El archivo se a guardado Exitosamente",
+             "Información",JOptionPane.INFORMATION_MESSAGE);
+    }
+ }
+  catch(Exception c)
+  {
+   JOptionPane.showMessageDialog(null,
+        "Su archivo no se ha guardado",
+           "Advertencia",JOptionPane.WARNING_MESSAGE);
+  }
+ 
+}
+            if(e.getSource()==mi4){
+               
+                    
+                
+                
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileFilter(new FileNameExtensionFilter("archivos","txt"));
+		int estado = fileChooser.showOpenDialog(null);
+                if(estado== JFileChooser.APPROVE_OPTION){
+                 try {
+                     fis = new FileInputStream(fileChooser.getSelectedFile());
+                     this.longitudbytes = (int)fileChooser.getSelectedFile().length();
+                     PreparedStatement pps = cn.prepareStatement("INSERT INTO ASCII(id,nombre,archivo) VALUE (?,?,?)");
+                     pps.setString(1, txtid.getText());
+                     pps.setString(2, txtnombre.getText());
+                     pps.setBlob(3, fis, longitudbytes);
+                     pps.executeUpdate();
+                     JOptionPane.showMessageDialog(null, "datos guardados");
+                }
+                
+                
+                catch (Exception t) {
+                    JOptionPane.showMessageDialog(null, e.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+                
+            }
+            
+            } 
+ }
+
+             
+ }
+ }
+//}
+   
+
